@@ -1,0 +1,47 @@
+{
+    "name": "kerosin/craft-facebook-catalog-product-feed-pro",
+    "description": "Facebook Catalog Product Feed for Craft CMS.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "facebook",
+        "catalog",
+        "feed",
+        "facebook catalog product feed pro"
+    ],
+    "support": {
+        "docs": "https://github.com/kerosin/craft-facebook-catalog-product-feed-pro/blob/main/README.md",
+        "issues": "https://github.com/kerosin/craft-facebook-catalog-product-feed-pro/issues"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "kerosin",
+            "homepage": "https://github.com/kerosin"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "kerosin\\facebookcatalogproductfeedpro\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Facebook Catalog Product Feed Pro",
+        "handle": "facebook-catalog-product-feed-pro",
+        "developer": "kerosin",
+        "developerUrl": "https://github.com/kerosin",
+        "documentationUrl": "https://github.com/kerosin/craft-facebook-catalog-product-feed-pro/blob/main/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/kerosin/craft-facebook-catalog-product-feed-pro/main/CHANGELOG.md",
+        "components": {
+            "facebookCatalogProductFeedProService": "kerosin\\facebookcatalogproductfeedpro\\services\\FacebookCatalogProductFeedProService"
+        },
+        "class": "kerosin\\facebookcatalogproductfeedpro\\FacebookCatalogProductFeedPro"
+    }
+}
