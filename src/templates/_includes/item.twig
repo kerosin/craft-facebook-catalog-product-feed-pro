@@ -1,0 +1,202 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * @author    kerosin
+ * @copyright Copyright (c) 2021 kerosin
+ * @link      https://github.com/kerosin
+ * @package   FacebookCatalogProductFeedPro
+ * @since     1.1.0
+ */
+#}
+
+{% import 'facebook-catalog-product-feed-pro/_macros/fields' as fields %}
+
+{% set isCommerceInstalled = craft.app.plugins.isPluginInstalled('commerce') %}
+
+<item>
+
+    {# id #}
+    {{ fields.baseField('id', element, settings.idField) }}
+
+    {# title #}
+    {{ fields.baseField('title', element, settings.titleField) }}
+
+    {# description #}
+    {{ fields.baseField('description', element, settings.descriptionField) }}
+
+    {# availability #}
+    {% if craft.facebookCatalogProductFeedPro.isCustomValue(settings.availabilityField) %}
+        {% set availability = settings.availabilityCustomValue %}
+    {% elseif settings.availabilityField is not empty %}
+        {% set availability = craft.facebookCatalogProductFeedPro.elementFieldValue(
+            element,
+            settings.availabilityField
+        ) %}
+    {% elseif isCommerceInstalled %}
+        {% if element is instance of('craft\\commerce\\elements\\Product') %}
+            {% if element.defaultVariant.hasUnlimitedStock or element.defaultVariant.stock > 0 %}
+                {% set availability = constant('AVAILABILITY_IN_STOCK', settings) %}
+            {% else %}
+                {% set availability = constant('AVAILABILITY_OUT_OF_STOCK', settings) %}
+            {% endif %}
+        {% elseif element is instance of('craft\\commerce\\elements\\Variant') %}
+            {% if element.hasUnlimitedStock or element.stock > 0 %}
+                {% set availability = constant('AVAILABILITY_IN_STOCK', settings) %}
+            {% else %}
+                {% set availability = constant('AVAILABILITY_OUT_OF_STOCK', settings) %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    {% if availability is defined and availability is not empty %}
+        {% set availability = availability|striptags|trim %}
+    {% else %}
+        {% set availability = constant('AVAILABILITY_IN_STOCK', settings) %}
+    {% endif %}
+    <g:availability><![CDATA[{{ availability }}]]></g:availability>
+
+    {# condition #}
+    {{ fields.baseField('condition', element, settings.conditionField, settings.conditionCustomValue) }}
+
+    {# price #}
+    {{ fields.measureField(
+        'price',
+        element,
+        settings.priceField,
+        settings.currencyField,
+        settings.currencyCustomValue,
+        (isCommerceInstalled ? craft.commerce.paymentCurrencies.primaryPaymentCurrencyIso),
+        true
+    ) }}
+
+    {# link #}
+    {% if element.url is not empty %}
+        {% if
+            isCommerceInstalled and
+            settings.useProductUrl and
+            element is instance of ('craft\\commerce\\elements\\Variant') and
+            element.product is not empty
+        %}
+            {% set url = element.product.url %}
+        {% else %}
+            {% set url = element.url %}
+        {% endif %}
+        {% if url is not empty %}
+            <g:link><![CDATA[{{ url }}]]></g:link>
+        {% endif %}
+    {% endif %}
+
+    {# image_link #}
+    {{ fields.assetField('image_link', element, settings.imageLinkField) }}
+
+    {# brand #}
+    {{ fields.baseField('brand', element, settings.brandField, settings.brandCustomValue) }}
+
+    {# quantity_to_sell_on_facebook #}
+    {{ fields.baseField(
+        'quantity_to_sell_on_facebook',
+        element,
+        settings.quantityToSellOnFacebookField
+    ) }}
+
+    {# fb_product_category #}
+    {{ fields.baseField(
+        'fb_product_category',
+        element,
+        settings.fbProductCategoryField,
+        settings.fbProductCategoryCustomValue
+    ) }}
+
+    {# google_product_category #}
+    {{ fields.baseField(
+        'google_product_category',
+        element,
+        settings.googleProductCategoryField,
+        settings.googleProductCategoryCustomValue
+    ) }}
+
+    {# sale_price #}
+    {{ fields.measureField(
+        'sale_price',
+        element,
+        settings.salePriceField,
+        settings.currencyField,
+        settings.currencyCustomValue,
+        (isCommerceInstalled ? craft.commerce.paymentCurrencies.primaryPaymentCurrencyIso),
+        true
+    ) }}
+
+    {# sale_price_effective_date #}
+    {% if settings.salePriceField is not empty %}
+        {{ fields.dateRangeField(
+            'sale_price_effective_date',
+            element,
+            settings.salePriceEffectiveDateFromField,
+            settings.salePriceEffectiveDateToField
+        ) }}
+    {% endif %}
+
+    {# item_group_id #}
+    {{ fields.baseField('item_group_id', element, settings.itemGroupIdField) }}
+
+    {# status #}
+    {{ fields.baseField('status', element, settings.statusField, settings.statusCustomValue) }}
+
+    {# additional_image_link #}
+    {{ fields.assetField('additional_image_link', element, settings.additionalImageLinkField, true) }}
+
+    {# color #}
+    {{ fields.baseField('color', element, settings.colorField, settings.colorCustomValue) }}
+
+    {# gender #}
+    {{ fields.baseField('gender', element, settings.genderField, settings.genderCustomValue) }}
+
+    {# size #}
+    {{ fields.baseField('size', element, settings.sizeField, settings.sizeCustomValue) }}
+
+    {# age_group #}
+    {{ fields.baseField('age_group', element, settings.ageGroupField, settings.ageGroupCustomValue) }}
+
+    {# material #}
+    {{ fields.baseField('material', element, settings.materialField, settings.materialCustomValue) }}
+
+    {# pattern #}
+    {{ fields.baseField('pattern', element, settings.patternField, settings.patternCustomValue) }}
+
+    {# shipping_weight #}
+    {{ fields.measureField(
+        'shipping_weight',
+        element,
+        settings.shippingWeightField,
+        settings.shippingWeightUnitField,
+        settings.shippingWeightUnitCustomValue,
+        (isCommerceInstalled ? craft.commerce.settings.weightUnits)
+    ) }}
+
+    {# custom_label_0 #}
+    {{ fields.baseField('custom_label_0', element, settings.customLabel0Field) }}
+
+    {# custom_label_1 #}
+    {{ fields.baseField('custom_label_1', element, settings.customLabel1Field) }}
+
+    {# custom_label_2 #}
+    {{ fields.baseField('custom_label_2', element, settings.customLabel2Field) }}
+
+    {# custom_label_3 #}
+    {{ fields.baseField('custom_label_3', element, settings.customLabel3Field) }}
+
+    {# custom_label_4 #}
+    {{ fields.baseField('custom_label_4', element, settings.customLabel4Field) }}
+
+    {# product_type #}
+    {{ fields.baseField('product_type', element, settings.productTypeField, null, ' > ') }}
+
+    {# gtin #}
+    {{ fields.baseField('gtin', element, settings.gtinField) }}
+
+    {# mpn #}
+    {{ fields.baseField('mpn', element, settings.mpnField) }}
+
+    {# expiration_date #}
+    {{ fields.baseField('expiration_date', element, settings.expirationDateField) }}
+
+</item>

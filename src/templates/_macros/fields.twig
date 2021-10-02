@@ -1,7 +1,25 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * @author    kerosin
+ * @copyright Copyright (c) 2021 kerosin
+ * @link      https://github.com/kerosin
+ * @package   FacebookCatalogProductFeedPro
+ * @since     1.0.0
+ */
+#}
+
 {% macro baseField(tag, element, field, customValue, separator = ',') %}
     {% if field is not empty %}
         {% if craft.facebookCatalogProductFeedPro.isCustomValue(field) %}
             {% set value = customValue %}
+        {% elseif craft.facebookCatalogProductFeedPro.isUseProductId(field) %}
+            {% if
+                element is instance of ('craft\\commerce\\elements\\Variant') and
+                element.product is not empty
+            %}
+                {% set value = element.product.id %}
+            {% endif %}
         {% else %}
             {% set fieldValue = craft.facebookCatalogProductFeedPro.elementFieldValue(element, field) %}
             {% if fieldValue is instance of('DateTime') %}
@@ -10,7 +28,9 @@
                 {% if fieldValue|length %}
                     {% set items = [] %}
                     {% for item in fieldValue.all() %}
-                        {% set items = items|merge([item.title]) %}
+                        {% if item.title is defined and item.title is not empty %}
+                            {% set items = items|merge([item.title]) %}
+                        {% endif %}
                     {% endfor %}
                     {% set value = items|join(separator) %}
                 {% endif %}
@@ -27,7 +47,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro measureField(tag, element, field, unitField, unitCustomValue, unitDefaultValue, format = false) %}
+{% macro measureField(tag, element, field, unitField, unitCustomValue, unitDefaultValue, format = false, spaceUnit = true) %}
     {% if field is not empty %}
         {% set value = craft.facebookCatalogProductFeedPro.elementFieldValue(element, field)|striptags|trim %}
         {% if value is not empty %}
@@ -41,7 +61,7 @@
                 {% set unitValue = unitDefaultValue %}
             {% endif %}
             {% set unitValue = unitValue is defined ? unitValue|striptags|trim %}
-            <g:{{ tag }}>{{ value }}{{ unitValue is not empty ? ' ' ~ unitValue }}</g:{{ tag }}>
+            <g:{{ tag }}>{{ value }}{{ unitValue is not empty ? (spaceUnit ? ' ') ~ unitValue }}</g:{{ tag }}>
         {% endif %}
     {% endif %}
 {% endmacro %}
