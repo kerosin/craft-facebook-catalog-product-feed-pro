@@ -79,10 +79,7 @@ class FacebookCatalogProductFeedPro extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        // Register routes
         $this->registerRoutes();
-
-        // Register variables
         $this->registerVariables();
     }
 
