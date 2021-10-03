@@ -268,15 +268,35 @@
     errors: settings.getErrors('salePriceField')
 }) }}
 
+{% set salePriceEffectiveDateFromFieldOptions = [{label: '', value: ''}] %}
+{% if isCommerceInstalled %}
+    {% set salePriceEffectiveDateFromFieldOptions = salePriceEffectiveDateFromFieldOptions|merge([
+        {
+            label: 'Use Sale Start Date'|t('facebook-catalog-product-feed-pro'),
+            value: constant('OPTION_USE_SALE_START_DATE', settings)
+        }
+    ]) %}
+{% endif %}
+
 {{ forms.selectField({
     label: 'Sale Price Effective Date From'|t('facebook-catalog-product-feed-pro'),
     instructions: 'The date, time and time zone when the sale starts.'|t('facebook-catalog-product-feed-pro'),
     id: 'salePriceEffectiveDateFromField',
     name: 'salePriceEffectiveDateFromField',
     value: settings.salePriceEffectiveDateFromField,
-    options: {'': ''}|merge(fieldOptions),
+    options: salePriceEffectiveDateFromFieldOptions|merge(fieldOptions),
     errors: settings.getErrors('salePriceEffectiveDateFromField')
 }) }}
+
+{% set salePriceEffectiveDateToFieldOptions = [{label: '', value: ''}] %}
+{% if isCommerceInstalled %}
+    {% set salePriceEffectiveDateToFieldOptions = salePriceEffectiveDateToFieldOptions|merge([
+        {
+            label: 'Use Sale End Date'|t('facebook-catalog-product-feed-pro'),
+            value: constant('OPTION_USE_SALE_END_DATE', settings)
+        }
+    ]) %}
+{% endif %}
 
 {{ forms.selectField({
     label: 'Sale Price Effective Date To'|t('facebook-catalog-product-feed-pro'),
@@ -284,7 +304,7 @@
     id: 'salePriceEffectiveDateToField',
     name: 'salePriceEffectiveDateToField',
     value: settings.salePriceEffectiveDateToField,
-    options: {'': ''}|merge(fieldOptions),
+    options: salePriceEffectiveDateToFieldOptions|merge(fieldOptions),
     errors: settings.getErrors('salePriceEffectiveDateToField')
 }) }}
 

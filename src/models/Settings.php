@@ -26,6 +26,14 @@ class Settings extends Model
      * @since 1.1.0
      */
     const OPTION_USE_PRODUCT_ID = '__use_product_id__';
+    /**
+     * @since 1.2.0
+     */
+    const OPTION_USE_SALE_START_DATE = '__use_sale_start_date__';
+    /**
+     * @since 1.2.0
+     */
+    const OPTION_USE_SALE_END_DATE = '__use_sale_end_date__';
 
     const AVAILABILITY_IN_STOCK = 'in stock';
     const AVAILABILITY_OUT_OF_STOCK = 'out of stock';
@@ -423,6 +431,7 @@ class Settings extends Model
         return [
             'sku' => Craft::t('facebook-catalog-product-feed-pro', 'SKU'),
             'price' => Craft::t('facebook-catalog-product-feed-pro', 'Price'),
+            'salePrice' => Craft::t('facebook-catalog-product-feed-pro', 'Sale Price'),
             'stock' => Craft::t('facebook-catalog-product-feed-pro', 'Stock'),
             'length' => Craft::t('facebook-catalog-product-feed-pro', 'Dimensions (L)'),
             'width' => Craft::t('facebook-catalog-product-feed-pro', 'Dimensions (W)'),
@@ -503,6 +512,8 @@ class Settings extends Model
             array_keys([
                 self::OPTION_CUSTOM_VALUE => Craft::t('facebook-catalog-product-feed-pro', 'Custom Value'),
                 self::OPTION_USE_PRODUCT_ID => Craft::t('facebook-catalog-product-feed-pro', 'Use Product ID'),
+                self::OPTION_USE_SALE_START_DATE => Craft::t('facebook-catalog-product-feed-pro', 'Use Sale Start Date'),
+                self::OPTION_USE_SALE_END_DATE => Craft::t('facebook-catalog-product-feed-pro', 'Use Sale End Date'),
             ]),
             array_keys($this->getStandardFields()),
             array_keys($this->getCustomFields())
