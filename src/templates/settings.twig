@@ -11,8 +11,16 @@
 
 {% import '_includes/forms' as forms %}
 
+{% do view.registerAssetBundle('kerosin\\facebookcatalogproductfeedpro\\assetbundles\\facebookcatalogproductfeedpro\\FacebookCatalogProductFeedProAsset') %}
+
 {% set fieldOptions = settings.getFieldOptions() %}
 {% set isCommerceInstalled = craft.app.plugins.isPluginInstalled('commerce') %}
+
+{% if craft.app.plugins.pluginInfo('facebook-catalog-product-feed-pro').isTrial %}
+    <div class="warning-alert warning with-icon">
+        {{ 'This is a TRIAL version. The feed is limited to a few items.'|t('facebook-catalog-product-feed-pro') }}
+    </div>
+{% endif %}
 
 {% if isCommerceInstalled %}
     <h2>{{ 'General'|t('facebook-catalog-product-feed-pro') }}</h2>

@@ -80,6 +80,10 @@ class FacebookCatalogProductFeedProService extends Component
      */
     public function getFeedXml(array $elements): string
     {
+        if (Craft::$app->getPlugins()->getPluginInfo('facebook-catalog-product-feed-pro')['isTrial']) {
+            $elements = array_slice($elements, 0, 10);
+        }
+
         $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
 
         return Craft::$app->getView()->renderTemplate(
