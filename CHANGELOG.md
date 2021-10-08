@@ -1,5 +1,10 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.2.1 - 2021-10-08
+### Added
+- Added usability improvements
+- Added support for some standard fields
+
 ## 1.2.0 - 2021-10-03
 ### Added
 - Added "Sale Price" option
