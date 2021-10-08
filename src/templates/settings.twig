@@ -9,9 +9,42 @@
  */
 #}
 
+{% do view.registerAssetBundle('kerosin\\facebookcatalogproductfeedpro\\assetbundles\\facebookcatalogproductfeedpro\\FacebookCatalogProductFeedProAsset') %}
+
 {% import '_includes/forms' as forms %}
 
-{% do view.registerAssetBundle('kerosin\\facebookcatalogproductfeedpro\\assetbundles\\facebookcatalogproductfeedpro\\FacebookCatalogProductFeedProAsset') %}
+{% macro customValueField(name, options, settings, label, instructions) %}
+    {% set input %}
+        <div class="flex">
+            <div>
+                {{ forms.select({
+                    id: name ~ 'Field',
+                    name: name ~ 'Field',
+                    value: settings[name ~ 'Field'],
+                    options: options,
+                    toggle: true,
+                    targetPrefix: name ~ '-field'
+                }) }}
+            </div>
+            <div class="flex-grow">
+                <div id="{{ name }}-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings[name ~ 'Field']) ? ' class="hidden"' }}>
+                    {{ forms.text({
+                        id: name ~ 'CustomValue',
+                        class: 'ltr',
+                        name: name ~ 'CustomValue',
+                        value: settings[name ~ 'CustomValue']
+                    }) }}
+                </div>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ forms.field({
+        label: label,
+        instructions: instructions,
+        errors: settings.getErrors(name ~ 'Field') ?: settings.getErrors(name ~ 'CustomValue')
+    }, input) }}
+{% endmacro %}
 
 {% set fieldOptions = settings.getFieldOptions() %}
 {% set isCommerceInstalled = craft.app.plugins.isPluginInstalled('commerce') %}
@@ -95,70 +128,24 @@
     errors: settings.getErrors('descriptionField')
 }) }}
 
-{% set availabilityFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'availabilityField',
-                name: 'availabilityField',
-                value: settings.availabilityField,
-                options: [
-                    {label: (isCommerceInstalled ? 'Use Stock Field'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-                    {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-                ]|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'availability-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="availability-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.availabilityField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'availabilityCustomValue',
-                    class: 'ltr',
-                    name: 'availabilityCustomValue',
-                    value: settings.availabilityCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
+{{ _self.customValueField(
+    'availability',
+    [
+        {label: (isCommerceInstalled ? 'Use Stock Field'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+    ]|merge(fieldOptions),
+    settings,
+    'Availability'|t('facebook-catalog-product-feed-pro'),
+    'The current availability of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{{ forms.field({
-    label: 'Availability'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The current availability of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('availabilityField') ?: settings.getErrors('availabilityCustomValue')
-}, availabilityFieldInput) }}
-
-{% set conditionFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'conditionField',
-                name: 'conditionField',
-                value: settings.conditionField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'condition-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="condition-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.conditionField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'conditionCustomValue',
-                    class: 'ltr',
-                    name: 'conditionCustomValue',
-                    value: settings.conditionCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Condition'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The condition of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('conditionField') ?: settings.getErrors('conditionCustomValue')
-}, conditionFieldInput) }}
+{{ _self.customValueField(
+    'condition',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Condition'|t('facebook-catalog-product-feed-pro'),
+    'The condition of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Price'|t('facebook-catalog-product-feed-pro'),
@@ -170,38 +157,15 @@
     errors: settings.getErrors('priceField')
 }) }}
 
-{% set currencyFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'currencyField',
-                name: 'currencyField',
-                value: settings.currencyField,
-                options: [
-                    {label: (isCommerceInstalled ? 'Use Base Currency'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-                    {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-                ]|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'currency-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="currency-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.currencyField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'currencyCustomValue',
-                    class: 'ltr',
-                    name: 'currencyCustomValue',
-                    value: settings.currencyCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Currency'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('currencyField') ?: settings.getErrors('currencyCustomValue')
-}, currencyFieldInput) }}
+{{ _self.customValueField(
+    'currency',
+    [
+        {label: (isCommerceInstalled ? 'Use Base Currency'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+    ]|merge(fieldOptions),
+    settings,
+    'Currency'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Image'|t('facebook-catalog-product-feed-pro'),
@@ -213,36 +177,13 @@
     errors: settings.getErrors('imageLinkField')
 }) }}
 
-{% set brandFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'brandField',
-                name: 'brandField',
-                value: settings.brandField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'brand-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="brand-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.brandField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'brandCustomValue',
-                    class: 'ltr',
-                    name: 'brandCustomValue',
-                    value: settings.brandCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Brand'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The brand name, unique manufacturer part number (MPN) or Global Trade Item Number (GTIN) of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('brandField') ?: settings.getErrors('brandCustomValue')
-}, brandFieldInput) }}
+{{ _self.customValueField(
+    'brand',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Brand'|t('facebook-catalog-product-feed-pro'),
+    'The brand name, unique manufacturer part number (MPN) or Global Trade Item Number (GTIN) of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 <h3>{{ 'Optional Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
 
@@ -256,67 +197,21 @@
     errors: settings.getErrors('quantityToSellOnFacebookField')
 }) }}
 
-{% set fbProductCategoryFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'fbProductCategoryField',
-                name: 'fbProductCategoryField',
-                value: settings.fbProductCategoryField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'fbProductCategory-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="fbProductCategory-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.fbProductCategoryField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'fbProductCategoryCustomValue',
-                    class: 'ltr',
-                    name: 'fbProductCategoryCustomValue',
-                    value: settings.fbProductCategoryCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
+{{ _self.customValueField(
+    'fbProductCategory',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Facebook Product Category'|t('facebook-catalog-product-feed-pro'),
+    'The Facebook product category for the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{{ forms.field({
-    label: 'Facebook Product Category'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The Facebook product category for the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('fbProductCategoryField') ?: settings.getErrors('fbProductCategoryCustomValue')
-}, fbProductCategoryFieldInput) }}
-
-{% set googleProductCategoryFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'googleProductCategoryField',
-                name: 'googleProductCategoryField',
-                value: settings.googleProductCategoryField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'googleProductCategory-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="googleProductCategory-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.googleProductCategoryField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'googleProductCategoryCustomValue',
-                    class: 'ltr',
-                    name: 'googleProductCategoryCustomValue',
-                    value: settings.googleProductCategoryCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Google Product Category'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The Google product category for the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('googleProductCategoryField') ?: settings.getErrors('googleProductCategoryCustomValue')
-}, googleProductCategoryFieldInput) }}
+{{ _self.customValueField(
+    'googleProductCategory',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Google Product Category'|t('facebook-catalog-product-feed-pro'),
+    'The Google product category for the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Sale Price'|t('facebook-catalog-product-feed-pro'),
@@ -388,36 +283,13 @@
     errors: settings.getErrors('itemGroupIdField')
 }) }}
 
-{% set statusFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'statusField',
-                name: 'statusField',
-                value: settings.statusField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'status-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="status-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.statusField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'statusCustomValue',
-                    class: 'ltr',
-                    name: 'statusCustomValue',
-                    value: settings.statusCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Status'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Controls whether the item is active or archived in your catalog.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('statusField') ?: settings.getErrors('statusCustomValue')
-}, statusFieldInput) }}
+{{ _self.customValueField(
+    'status',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Status'|t('facebook-catalog-product-feed-pro'),
+    'Controls whether the item is active or archived in your catalog.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Additional Image'|t('facebook-catalog-product-feed-pro'),
@@ -429,191 +301,53 @@
     errors: settings.getErrors('additionalImageLinkField')
 }) }}
 
-{% set colorFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'colorField',
-                name: 'colorField',
-                value: settings.colorField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'color-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="color-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.colorField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'colorCustomValue',
-                    class: 'ltr',
-                    name: 'colorCustomValue',
-                    value: settings.colorCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
+{{ _self.customValueField(
+    'color',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Color'|t('facebook-catalog-product-feed-pro'),
+    'The main color of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{{ forms.field({
-    label: 'Color'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The main color of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('colorField') ?: settings.getErrors('colorCustomValue')
-}, colorFieldInput) }}
+{{ _self.customValueField(
+    'gender',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Gender'|t('facebook-catalog-product-feed-pro'),
+    'The gender the item is targeted towards.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{% set genderFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'genderField',
-                name: 'genderField',
-                value: settings.genderField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'gender-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="gender-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.genderField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'genderCustomValue',
-                    class: 'ltr',
-                    name: 'genderCustomValue',
-                    value: settings.genderCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
+{{ _self.customValueField(
+    'size',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Size'|t('facebook-catalog-product-feed-pro'),
+    'The size of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{{ forms.field({
-    label: 'Gender'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The gender the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('genderField') ?: settings.getErrors('genderCustomValue')
-}, genderFieldInput) }}
+{{ _self.customValueField(
+    'ageGroup',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Age Group'|t('facebook-catalog-product-feed-pro'),
+    'The age group that the item is targeted towards.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{% set sizeFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'sizeField',
-                name: 'sizeField',
-                value: settings.sizeField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'size-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="size-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.sizeField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'sizeCustomValue',
-                    class: 'ltr',
-                    name: 'sizeCustomValue',
-                    value: settings.sizeCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
+{{ _self.customValueField(
+    'material',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Material'|t('facebook-catalog-product-feed-pro'),
+    'The material the item is made from.'|t('facebook-catalog-product-feed-pro')
+) }}
 
-{{ forms.field({
-    label: 'Size'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The size of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('sizeField') ?: settings.getErrors('sizeCustomValue')
-}, sizeFieldInput) }}
-
-{% set ageGroupFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'ageGroupField',
-                name: 'ageGroupField',
-                value: settings.ageGroupField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'ageGroup-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="ageGroup-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.ageGroupField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'ageGroupCustomValue',
-                    class: 'ltr',
-                    name: 'ageGroupCustomValue',
-                    value: settings.ageGroupCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Age Group'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The age group that the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('ageGroupField') ?: settings.getErrors('ageGroupCustomValue')
-}, ageGroupFieldInput) }}
-
-{% set materialFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'materialField',
-                name: 'materialField',
-                value: settings.materialField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'material-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="material-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.materialField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'materialCustomValue',
-                    class: 'ltr',
-                    name: 'materialCustomValue',
-                    value: settings.materialCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Material'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The material the item is made from.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('materialField') ?: settings.getErrors('materialCustomValue')
-}, materialFieldInput) }}
-
-{% set patternFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'patternField',
-                name: 'patternField',
-                value: settings.patternField,
-                options: customValueOptions|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'pattern-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="pattern-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.patternField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'patternCustomValue',
-                    class: 'ltr',
-                    name: 'patternCustomValue',
-                    value: settings.patternCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Pattern'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The pattern or graphic print on the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('patternField') ?: settings.getErrors('patternCustomValue')
-}, patternFieldInput) }}
+{{ _self.customValueField(
+    'pattern',
+    customValueOptions|merge(fieldOptions),
+    settings,
+    'Pattern'|t('facebook-catalog-product-feed-pro'),
+    'The pattern or graphic print on the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Shipping Weight'|t('facebook-catalog-product-feed-pro'),
@@ -625,39 +359,16 @@
     errors: settings.getErrors('shippingWeightField')
 }) }}
 
-{% set shippingWeightUnitFieldInput %}
-    <div class="flex">
-        <div>
-            {{ forms.select({
-                id: 'shippingWeightUnitField',
-                name: 'shippingWeightUnitField',
-                value: settings.shippingWeightUnitField,
-                options: [
-                    {label: (isCommerceInstalled ? 'Use Weight Unit'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-                    {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-                ]|merge(fieldOptions),
-                toggle: true,
-                targetPrefix: 'shippingWeightUnit-field'
-            }) }}
-        </div>
-        <div class="flex-grow">
-            <div id="shippingWeightUnit-field{{ constant('OPTION_CUSTOM_VALUE', settings) }}"{{ not craft.facebookCatalogProductFeedPro.isCustomValue(settings.shippingWeightUnitField) ? ' class="hidden"' }}>
-                {{ forms.text({
-                    id: 'shippingWeightUnitCustomValue',
-                    class: 'ltr',
-                    name: 'shippingWeightUnitCustomValue',
-                    value: settings.shippingWeightUnitCustomValue
-                }) }}
-            </div>
-        </div>
-    </div>
-{% endset %}
-
-{{ forms.field({
-    label: 'Shipping Weight Unit'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The shipping weight unit of the item.'|t('facebook-catalog-product-feed-pro'),
-    errors: settings.getErrors('shippingWeightUnitField') ?: settings.getErrors('shippingWeightUnitCustomValue')
-}, shippingWeightUnitFieldInput) }}
+{{ _self.customValueField(
+    'shippingWeightUnit',
+    [
+        {label: (isCommerceInstalled ? 'Use Weight Unit'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+    ]|merge(fieldOptions),
+    settings,
+    'Shipping Weight Unit'|t('facebook-catalog-product-feed-pro'),
+    'The shipping weight unit of the item.'|t('facebook-catalog-product-feed-pro')
+) }}
 
 {{ forms.selectField({
     label: 'Custom Label 0'|t('facebook-catalog-product-feed-pro'),
