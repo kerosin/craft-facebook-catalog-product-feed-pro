@@ -1,5 +1,9 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.2.2 - 2021-10-09
+### Fixed
+- Fixed output for Dropdown and Multi-select fields
+
 ## 1.2.1 - 2021-10-08
 ### Added
 - Added usability improvements
