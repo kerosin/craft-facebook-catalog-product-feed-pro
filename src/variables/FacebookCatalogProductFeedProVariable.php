@@ -9,12 +9,8 @@
 namespace kerosin\facebookcatalogproductfeedpro\variables;
 
 use kerosin\facebookcatalogproductfeedpro\FacebookCatalogProductFeedPro;
-use kerosin\facebookcatalogproductfeedpro\services\FacebookCatalogProductFeedProService;
 
-use Craft;
 use craft\base\Element;
-use craft\commerce\elements\Product;
-use craft\commerce\elements\Variant;
 
 use DateTime;
 use Exception;
@@ -30,6 +26,18 @@ class FacebookCatalogProductFeedProVariable
     // =========================================================================
 
     /**
+     * @param Element[] $elements
+     * @return void
+     * @throws Exception
+     */
+    public function generateFeed(array $elements): void
+    {
+        FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->generateFeed($elements);
+    }
+
+    /**
      * @param Element $element
      * @param string $field
      * @return mixed
@@ -37,29 +45,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementFieldValue(Element $element, string $field)
     {
-        $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
-        $object = $element;
-
-        if (Craft::$app->getPlugins()->isPluginInstalled('commerce')) {
-            if ($element instanceof Product) {
-                if (isset($element->getDefaultVariant()->$field)) {
-                    $object = $element->getDefaultVariant();
-                }
-            } elseif ($element instanceof Variant) {
-                $product = $element->getProduct();
-
-                if (
-                    !isset($element->$field) &&
-                    $settings->useProductData &&
-                    $product != null &&
-                    isset($product->$field)
-                ) {
-                    $object = $element->getProduct();
-                }
-            }
-        }
-
-        return isset($object->$field) ? $object->$field : null;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->getElementFieldValue($element, $field);
     }
 
     /**
@@ -69,37 +57,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSalesMinStartDate(Element $element): ?DateTime
     {
-        $result = null;
-
-        if (
-            !Craft::$app->getPlugins()->isPluginInstalled('commerce') ||
-            !($element instanceof Product || $element instanceof Variant)
-        ) {
-            return $result;
-        }
-
-        if ($element instanceof Product) {
-            $sales = $element->getDefaultVariant()->getSales();
-        } else {
-            $sales = $element->getSales();
-        }
-
-        if ($sales == null || count($sales) == 0) {
-            return $result;
-        }
-
-        foreach ($sales as $sale) {
-            if ($sale->dateFrom == null) {
-                $result = null;
-                break;
-            }
-
-            if ($result == null || $sale->dateFrom < $result) {
-                $result = $sale->dateFrom;
-            }
-        }
-
-        return $result;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->getElementSalesMinStartDate($element);
     }
 
     /**
@@ -109,37 +69,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSalesMaxEndDate(Element $element): ?DateTime
     {
-        $result = null;
-
-        if (
-            !Craft::$app->getPlugins()->isPluginInstalled('commerce') ||
-            !($element instanceof Product || $element instanceof Variant)
-        ) {
-            return $result;
-        }
-
-        if ($element instanceof Product) {
-            $sales = $element->getDefaultVariant()->getSales();
-        } else {
-            $sales = $element->getSales();
-        }
-
-        if ($sales == null || count($sales) == 0) {
-            return $result;
-        }
-
-        foreach ($sales as $sale) {
-            if ($sale->dateTo == null) {
-                $result = null;
-                break;
-            }
-
-            if ($result == null || $sale->dateTo > $result) {
-                $result = $sale->dateTo;
-            }
-        }
-
-        return $result;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->getElementSalesMaxEndDate($element);
     }
 
     /**
@@ -148,9 +80,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isCustomValue(?string $value): bool
     {
-        $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
-
-        return $value == $settings::OPTION_CUSTOM_VALUE;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->isCustomValue($value);
     }
 
     /**
@@ -160,9 +92,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseProductId(?string $value): bool
     {
-        $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
-
-        return $value == $settings::OPTION_USE_PRODUCT_ID;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->isUseProductId($value);
     }
 
     /**
@@ -172,9 +104,9 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseSaleStartDate(?string $value): bool
     {
-        $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
-
-        return $value == $settings::OPTION_USE_SALE_START_DATE;
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->isUseSaleStartDate($value);
     }
 
     /**
@@ -184,24 +116,8 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseSaleEndDate(?string $value): bool
     {
-        $settings = FacebookCatalogProductFeedPro::$plugin->getSettings();
-
-        return $value == $settings::OPTION_USE_SALE_END_DATE;
-    }
-
-    /**
-     * @param Element[] $elements
-     * @return void
-     * @throws Exception
-     */
-    public function generateFeed(array $elements): void
-    {
-        $response = Craft::$app->getResponse();
-        $response->getHeaders()->set('Content-Type', 'application/xml; charset=UTF-8');
-
-        /** @var FacebookCatalogProductFeedProService $facebookCatalogProductFeedProService */
-        $facebookCatalogProductFeedProService = FacebookCatalogProductFeedPro::$plugin->facebookCatalogProductFeedProService;
-
-        echo $facebookCatalogProductFeedProService->getFeedXml($elements);
+        return FacebookCatalogProductFeedPro::$plugin
+            ->facebookCatalogProductFeedProService
+            ->isUseSaleEndDate($value);
     }
 }
