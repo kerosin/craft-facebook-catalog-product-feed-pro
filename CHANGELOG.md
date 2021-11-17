@@ -1,5 +1,13 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.3.0 - 2021-11-17
+### Added
+- Added "Custom Value" option to "Quantity to Sell on Facebook" field
+
+### Changed
+- Updated feed template
+- Updated plugin icon
+
 ## 1.2.2 - 2021-10-09
 ### Fixed
 - Fixed output for Dropdown and Multi-select fields
