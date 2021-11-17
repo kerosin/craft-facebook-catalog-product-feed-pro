@@ -198,14 +198,12 @@
 
 <h3>{{ 'Optional Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
 
-{{ forms.selectField({
+{{ _self.customValueField({
     label: 'Quantity to Sell on Facebook'|t('facebook-catalog-product-feed-pro'),
     instructions: 'The quantity of this item that you have available to sell on Facebook and Instagram.'|t('facebook-catalog-product-feed-pro'),
-    id: 'quantityToSellOnFacebookField',
-    name: 'quantityToSellOnFacebookField',
-    value: settings.quantityToSellOnFacebookField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('quantityToSellOnFacebookField')
+    name: 'quantityToSellOnFacebook',
+    options: customValueOptions|merge(fieldOptions),
+    settings: settings
 }) }}
 
 {{ _self.customValueField({

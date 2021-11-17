@@ -164,6 +164,13 @@ class Settings extends Model
     public $quantityToSellOnFacebookField;
 
     /**
+     * Quantity to sell on facebook custom value.
+     *
+     * @var string
+     */
+    public $quantityToSellOnFacebookCustomValue;
+
+    /**
      * FB product category [fb_product_category] field.
      *
      * @var string
