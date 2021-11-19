@@ -11,6 +11,7 @@ namespace kerosin\facebookcatalogproductfeedpro;
 use kerosin\facebookcatalogproductfeedpro\services\FacebookCatalogProductFeedProService;
 use kerosin\facebookcatalogproductfeedpro\variables\FacebookCatalogProductFeedProVariable;
 use kerosin\facebookcatalogproductfeedpro\models\Settings;
+use kerosin\facebookcatalogproductfeedpro\web\twig\Extension;
 
 use Craft;
 use craft\base\Plugin;
@@ -77,8 +78,10 @@ class FacebookCatalogProductFeedPro extends Plugin
     public function init()
     {
         parent::init();
+
         self::$plugin = $this;
 
+        $this->registerTwigExtensions();
         $this->registerRoutes();
         $this->registerVariables();
     }
@@ -109,6 +112,16 @@ class FacebookCatalogProductFeedPro extends Plugin
                 'settings' => $this->getSettings(),
             ]
         );
+    }
+
+    /**
+     * Registers twig extensions.
+     *
+     * @return void
+     */
+    protected function registerTwigExtensions(): void
+    {
+        Craft::$app->view->registerTwigExtension(new Extension);
     }
 
     /**
