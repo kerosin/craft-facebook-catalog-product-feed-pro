@@ -1,5 +1,9 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.3.1 - 2021-11-19
+### Fixed
+- Fixed bug that could occur if Craft Commerce plugin was not installed
+
 ## 1.3.0 - 2021-11-17
 ### Added
 - Added "Custom Value" option to "Quantity to Sell on Facebook" field
