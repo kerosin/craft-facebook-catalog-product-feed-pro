@@ -571,6 +571,19 @@ class FacebookCatalogProductFeedProService extends Component
         return Craft::$app->getPlugins()->isPluginInstalled('commerce');
     }
 
+    /**
+     * @param Element $element
+     * @return bool
+     * @throws Exception
+     * @since 1.4.0
+     */
+    public function isIncludeElementVariants(Element $element): bool
+    {
+        return $this->getSettings()->includeVariants &&
+            $element instanceof Product &&
+            $element->getType()->hasVariants;
+    }
+
     // Protected Methods
     // =========================================================================
 
