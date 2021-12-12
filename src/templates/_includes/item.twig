@@ -11,11 +11,8 @@
 
 {% import 'facebook-catalog-product-feed-pro/_macros/xml' as xml %}
 
-{% set currencyIso = craft.facebookCatalogProductFeedPro.elementCurrencyIso(
-    element,
-    settings.currencyField,
-    settings.currencyCustomValue
-) %}
+{% set variables = craft.facebookCatalogProductFeedPro %}
+{% set currencyIso = variables.elementCurrencyIso(element, settings.currencyField, settings.currencyCustomValue) %}
 
 <item>
 
@@ -43,7 +40,7 @@
     {# availability #}
     {{ xml.element({
         tag: 'availability',
-        value: craft.facebookCatalogProductFeedPro.elementAvailabilityFieldValue(element)
+        value: variables.elementAvailabilityFieldValue(element)
     }) }}
 
     {# condition #}
@@ -67,7 +64,7 @@
     {# link #}
     {{ xml.element({
         tag: 'link',
-        value: craft.facebookCatalogProductFeedPro.elementUrl(element)
+        value: variables.elementUrl(element)
     }) }}
 
     {# image_link #}
@@ -111,8 +108,8 @@
 
     {# sale_price #}
     {% if settings.priceField is not empty and settings.salePriceField is not empty %}
-        {% set price = craft.facebookCatalogProductFeedPro.elementFieldValue(element, settings.priceField) %}
-        {% set salePrice = craft.facebookCatalogProductFeedPro.elementFieldValue(element, settings.salePriceField) %}
+        {% set price = variables.elementFieldValue(element, settings.priceField) %}
+        {% set salePrice = variables.elementFieldValue(element, settings.salePriceField) %}
 
         {% if price is not empty and salePrice is not empty and salePrice < price %}
             {{ xml.element({
@@ -129,14 +126,8 @@
                 settings.salePriceEffectiveDateFromField is not empty and
                 settings.salePriceEffectiveDateToField is not empty
             %}
-                {% set dateFrom = craft.facebookCatalogProductFeedPro.elementSaleStartDate(
-                    element,
-                    settings.salePriceEffectiveDateFromField
-                ) %}
-                {% set dateTo = craft.facebookCatalogProductFeedPro.elementSaleEndDate(
-                    element,
-                    settings.salePriceEffectiveDateToField
-                ) %}
+                {% set dateFrom = variables.elementSaleStartDate(element, settings.salePriceEffectiveDateFromField) %}
+                {% set dateTo = variables.elementSaleEndDate(element, settings.salePriceEffectiveDateToField) %}
 
                 {{ xml.element({
                     tag: 'sale_price_effective_date',
@@ -150,7 +141,7 @@
     {# item_group_id #}
     {{ xml.element({
         tag: 'item_group_id',
-        value: craft.facebookCatalogProductFeedPro.elementItemGroupIdFieldValue(element)
+        value: variables.elementItemGroupIdFieldValue(element)
     }) }}
 
     {# status #}
@@ -222,7 +213,7 @@
         tag: 'shipping_weight',
         element: element,
         field: settings.shippingWeightField,
-        suffix: craft.facebookCatalogProductFeedPro.elementWeightUnit(
+        suffix: variables.elementWeightUnit(
             element,
             settings.shippingWeightUnitField,
             settings.shippingWeightUnitCustomValue
