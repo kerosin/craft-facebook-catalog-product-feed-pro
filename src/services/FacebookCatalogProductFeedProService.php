@@ -66,7 +66,7 @@ class FacebookCatalogProductFeedProService extends Component
     {
         $result = [];
 
-        if (!Craft::$app->getPlugins()->isPluginInstalled('commerce')) {
+        if (!$this->isCommerceInstalled()) {
             return $result;
         }
 
@@ -159,7 +159,7 @@ class FacebookCatalogProductFeedProService extends Component
 
         $object = $element;
 
-        if (Craft::$app->getPlugins()->isPluginInstalled('commerce')) {
+        if ($this->isCommerceInstalled()) {
             if ($element instanceof Product) {
                 if (isset($element->getDefaultVariant()->{$field})) {
                     $object = $element->getDefaultVariant();
@@ -539,7 +539,7 @@ class FacebookCatalogProductFeedProService extends Component
      */
     public function isUseStockField(?string $value): bool
     {
-        return $value == null && Craft::$app->getPlugins()->isPluginInstalled('commerce');
+        return $value == null && $this->isCommerceInstalled();
     }
 
     /**
@@ -549,7 +549,7 @@ class FacebookCatalogProductFeedProService extends Component
      */
     public function isUseBaseCurrency(?string $value): bool
     {
-        return $value == null && Craft::$app->getPlugins()->isPluginInstalled('commerce');
+        return $value == null && $this->isCommerceInstalled();
     }
 
     /**
@@ -559,7 +559,16 @@ class FacebookCatalogProductFeedProService extends Component
      */
     public function isUseWeightUnit(?string $value): bool
     {
-        return $value == null && Craft::$app->getPlugins()->isPluginInstalled('commerce');
+        return $value == null && $this->isCommerceInstalled();
+    }
+
+    /**
+     * @return bool
+     * @since 1.4.0
+     */
+    public function isCommerceInstalled(): bool
+    {
+        return Craft::$app->getPlugins()->isPluginInstalled('commerce');
     }
 
     // Protected Methods
