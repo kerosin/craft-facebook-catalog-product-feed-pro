@@ -48,10 +48,7 @@ class FeedController extends Controller
         $response->format = Response::FORMAT_RAW;
         $response->getHeaders()->set('Content-Type', 'application/xml; charset=UTF-8');
 
-        /** @var FacebookCatalogProductFeedProService $facebookCatalogProductFeedProService */
-        $facebookCatalogProductFeedProService = FacebookCatalogProductFeedPro::$plugin->facebookCatalogProductFeedProService;
-
-        return $facebookCatalogProductFeedProService->getEntriesFeedXml();
+        return $this->getService()->getEntriesFeedXml();
     }
 
     /**
@@ -64,9 +61,18 @@ class FeedController extends Controller
         $response->format = Response::FORMAT_RAW;
         $response->getHeaders()->set('Content-Type', 'application/xml; charset=UTF-8');
 
-        /** @var FacebookCatalogProductFeedProService $facebookCatalogProductFeedProService */
-        $facebookCatalogProductFeedProService = FacebookCatalogProductFeedPro::$plugin->facebookCatalogProductFeedProService;
+        return $this->getService()->getProductsFeedXml();
+    }
 
-        return $facebookCatalogProductFeedProService->getProductsFeedXml();
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @return FacebookCatalogProductFeedProService
+     * @since 1.4.0
+     */
+    protected function getService(): FacebookCatalogProductFeedProService
+    {
+        return FacebookCatalogProductFeedPro::$plugin->facebookCatalogProductFeedProService;
     }
 }

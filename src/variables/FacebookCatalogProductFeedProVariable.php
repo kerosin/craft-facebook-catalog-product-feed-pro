@@ -9,6 +9,7 @@
 namespace kerosin\facebookcatalogproductfeedpro\variables;
 
 use kerosin\facebookcatalogproductfeedpro\FacebookCatalogProductFeedPro;
+use kerosin\facebookcatalogproductfeedpro\services\FacebookCatalogProductFeedProService;
 
 use craft\base\Element;
 
@@ -32,9 +33,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function generateFeed(array $elements): void
     {
-        FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->generateFeed($elements);
+        $this->getService()->generateFeed($elements);
     }
 
     /**
@@ -46,9 +45,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementFieldValue(Element $element, ?string $field, $customValue = null)
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementFieldValue($element, $field, $customValue);
+        return $this->getService()->getElementFieldValue($element, $field, $customValue);
     }
 
     /**
@@ -58,9 +55,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSalesMinStartDate(Element $element): ?DateTime
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementSalesMinStartDate($element);
+        return $this->getService()->getElementSalesMinStartDate($element);
     }
 
     /**
@@ -70,9 +65,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSalesMaxEndDate(Element $element): ?DateTime
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementSalesMaxEndDate($element);
+        return $this->getService()->getElementSalesMaxEndDate($element);
     }
 
     /**
@@ -83,9 +76,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementUrl(Element $element): ?string
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementUrl($element);
+        return $this->getService()->getElementUrl($element);
     }
 
     /**
@@ -96,9 +87,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementAvailabilityFieldValue(Element $element)
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementAvailabilityFieldValue($element);
+        return $this->getService()->getElementAvailabilityFieldValue($element);
     }
 
     /**
@@ -109,9 +98,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementItemGroupIdFieldValue(Element $element)
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementItemGroupIdFieldValue($element);
+        return $this->getService()->getElementItemGroupIdFieldValue($element);
     }
 
     /**
@@ -124,9 +111,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementCurrencyIso(Element $element, ?string $field, $customValue = null): ?string
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementCurrencyIso($element, $field, $customValue);
+        return $this->getService()->getElementCurrencyIso($element, $field, $customValue);
     }
 
     /**
@@ -139,9 +124,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementWeightUnit(Element $element, ?string $field, $customValue = null): ?string
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementWeightUnit($element, $field, $customValue);
+        return $this->getService()->getElementWeightUnit($element, $field, $customValue);
     }
 
     /**
@@ -153,9 +136,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSaleStartDate(Element $element, ?string $field): ?string
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementSaleStartDate($element, $field);
+        return $this->getService()->getElementSaleStartDate($element, $field);
     }
 
     /**
@@ -167,9 +148,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function elementSaleEndDate(Element $element, ?string $field): ?string
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->getElementSaleEndDate($element, $field);
+        return $this->getService()->getElementSaleEndDate($element, $field);
     }
 
     /**
@@ -178,9 +157,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isCustomValue(?string $value): bool
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->isCustomValue($value);
+        return $this->getService()->isCustomValue($value);
     }
 
     /**
@@ -191,9 +168,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseProductId(?string $value): bool
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->isUseProductId($value);
+        return $this->getService()->isUseProductId($value);
     }
 
     /**
@@ -204,9 +179,7 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseSaleStartDate(?string $value): bool
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->isUseSaleStartDate($value);
+        return $this->getService()->isUseSaleStartDate($value);
     }
 
     /**
@@ -217,8 +190,18 @@ class FacebookCatalogProductFeedProVariable
      */
     public function isUseSaleEndDate(?string $value): bool
     {
-        return FacebookCatalogProductFeedPro::$plugin
-            ->facebookCatalogProductFeedProService
-            ->isUseSaleEndDate($value);
+        return $this->getService()->isUseSaleEndDate($value);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * @return FacebookCatalogProductFeedProService
+     * @since 1.4.0
+     */
+    protected function getService(): FacebookCatalogProductFeedProService
+    {
+        return FacebookCatalogProductFeedPro::$plugin->facebookCatalogProductFeedProService;
     }
 }
