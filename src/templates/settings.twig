@@ -64,483 +64,522 @@
     {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
 ] %}
 
-{% if craft.app.plugins.pluginInfo('facebook-catalog-product-feed-pro').isTrial %}
-    <div class="warning-alert warning with-icon">
-        {{ 'This is a TRIAL version. The feed is limited to a few items.'|t('facebook-catalog-product-feed-pro') }}
-    </div>
-{% endif %}
+{% set filtersTabErrorKeys = [
+    'entryStatusFilter',
+    'entryTypeFilter',
+    'entryCategoryFilter',
+    'productStatusFilter',
+    'productTypeFilter',
+    'productCategoryFilter',
+    'productAvailableForPurchaseFilter'
+] %}
+{% set errors = settings.getErrors()|keys %}
 
-{% if isCommerceInstalled %}
-    <h2>{{ 'General'|t('facebook-catalog-product-feed-pro') }}</h2>
+{% set tabs = {
+    0: {
+        label: 'General'|t('facebook-catalog-product-feed-pro'),
+        url: '#settings-tab-general',
+        class: errors|diff(filtersTabErrorKeys)|length ? 'error' : ''
+    },
+    1: {
+        label: 'Filters'|t('facebook-catalog-product-feed-pro'),
+        url: '#settings-tab-filters',
+        class: errors|intersect(filtersTabErrorKeys)|length ? 'error' : ''
+    }
+} %}
 
-    <h3>{{ 'Variants'|t('facebook-catalog-product-feed-pro') }}</h3>
+<header id="content-header" class="pane-header">
+    {% include '_includes/tabs' with {
+        containerAttributes: {
+            id: 'tabs'
+        }
+    } %}
+</header>
 
-    {{ forms.lightswitchField({
-        label: 'Include Variants'|t('facebook-catalog-product-feed-pro'),
-        id: 'includeVariants',
-        name: 'includeVariants',
-        on: settings.includeVariants,
-        errors: settings.getErrors('includeVariants'),
-        toggle: 'includeVariants-dependent-fields'
-    }) }}
+{% namespace 'settings' %}
+    <div id="tab-general">
 
-    <div id="includeVariants-dependent-fields"{{ not settings.includeVariants ? ' class="hidden"' }}>
-        {{ forms.lightswitchField({
-            label: 'Use Product Url for Variants'|t('facebook-catalog-product-feed-pro'),
-            id: 'useProductUrl',
-            name: 'useProductUrl',
-            on: settings.useProductUrl,
-            errors: settings.getErrors('useProductUrl')
+        {% if craft.app.plugins.pluginInfo('facebook-catalog-product-feed-pro').isTrial %}
+            <div class="warning-alert warning with-icon">
+                {{ 'This is a TRIAL version. The feed is limited to a few items.'|t('facebook-catalog-product-feed-pro') }}
+            </div>
+        {% endif %}
+
+        {% if isCommerceInstalled %}
+            <h2>{{ 'Settings'|t('facebook-catalog-product-feed-pro') }}</h2>
+
+            <h3>{{ 'Variants'|t('facebook-catalog-product-feed-pro') }}</h3>
+
+            {{ forms.lightswitchField({
+                label: 'Include Variants'|t('facebook-catalog-product-feed-pro'),
+                id: 'includeVariants',
+                name: 'includeVariants',
+                on: settings.includeVariants,
+                errors: settings.getErrors('includeVariants'),
+                toggle: 'includeVariants-dependent-fields'
+            }) }}
+
+            <div id="includeVariants-dependent-fields"{{ not settings.includeVariants ? ' class="hidden"' }}>
+                {{ forms.lightswitchField({
+                    label: 'Use Product Url for Variants'|t('facebook-catalog-product-feed-pro'),
+                    id: 'useProductUrl',
+                    name: 'useProductUrl',
+                    on: settings.useProductUrl,
+                    errors: settings.getErrors('useProductUrl')
+                }) }}
+
+                {{ forms.lightswitchField({
+                    label: 'Use Product Data for Variants'|t('facebook-catalog-product-feed-pro'),
+                    id: 'useProductData',
+                    name: 'useProductData',
+                    on: settings.useProductData,
+                    errors: settings.getErrors('useProductData')
+                }) }}
+            </div>
+
+            <hr>
+        {% endif %}
+
+        <h2>{{ 'Fields Mapping'|t('facebook-catalog-product-feed-pro') }}</h2>
+
+        <h3>{{ 'Required Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
+
+        {{ forms.selectField({
+            label: 'ID'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'A unique content ID for the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'idField',
+            name: 'idField',
+            value: settings.idField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('idField')
         }) }}
 
-        {{ forms.lightswitchField({
-            label: 'Use Product Data for Variants'|t('facebook-catalog-product-feed-pro'),
-            id: 'useProductData',
-            name: 'useProductData',
-            on: settings.useProductData,
-            errors: settings.getErrors('useProductData')
+        {{ forms.selectField({
+            label: 'Title'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'A specific, relevant title for the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'titleField',
+            name: 'titleField',
+            value: settings.titleField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('titleField')
         }) }}
+
+        {{ forms.selectField({
+            label: 'Description'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'A short, relevant description of the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'descriptionField',
+            name: 'descriptionField',
+            value: settings.descriptionField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('descriptionField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Availability'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The current availability of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'availability',
+            options: [
+                {label: (isCommerceInstalled ? 'Use Stock Field'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+                {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+            ]|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Condition'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The condition of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'condition',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Price'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The price of the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'priceField',
+            name: 'priceField',
+            value: settings.priceField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('priceField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Currency'|t('facebook-catalog-product-feed-pro'),
+            name: 'currency',
+            options: [
+                {label: (isCommerceInstalled ? 'Use Base Currency'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+                {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+            ]|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Image'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The main image of the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'imageLinkField',
+            name: 'imageLinkField',
+            value: settings.imageLinkField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('imageLinkField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Brand'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The brand name, unique manufacturer part number (MPN) or Global Trade Item Number (GTIN) of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'brand',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        <h3>{{ 'Optional Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
+
+        {{ _self.customValueField({
+            label: 'Quantity to Sell on Facebook'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The quantity of this item that you have available to sell on Facebook and Instagram.'|t('facebook-catalog-product-feed-pro'),
+            name: 'quantityToSellOnFacebook',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Facebook Product Category'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The Facebook product category for the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'fbProductCategory',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Google Product Category'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The Google product category for the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'googleProductCategory',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Sale Price'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'If the item is on sale, enter its discounted price.'|t('facebook-catalog-product-feed-pro'),
+            id: 'salePriceField',
+            name: 'salePriceField',
+            value: settings.salePriceField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('salePriceField')
+        }) }}
+
+        {% set salePriceEffectiveDateFromFieldOptions = [{label: '', value: ''}] %}
+        {% if isCommerceInstalled %}
+            {% set salePriceEffectiveDateFromFieldOptions = salePriceEffectiveDateFromFieldOptions|merge([
+                {
+                    label: 'Use Sale Start Date'|t('facebook-catalog-product-feed-pro'),
+                    value: constant('OPTION_USE_SALE_START_DATE', settings)
+                }
+            ]) %}
+        {% endif %}
+
+        {{ forms.selectField({
+            label: 'Sale Price Effective Date From'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The date, time and time zone when the sale starts.'|t('facebook-catalog-product-feed-pro'),
+            id: 'salePriceEffectiveDateFromField',
+            name: 'salePriceEffectiveDateFromField',
+            value: settings.salePriceEffectiveDateFromField,
+            options: salePriceEffectiveDateFromFieldOptions|merge(fieldOptions),
+            errors: settings.getErrors('salePriceEffectiveDateFromField')
+        }) }}
+
+        {% set salePriceEffectiveDateToFieldOptions = [{label: '', value: ''}] %}
+        {% if isCommerceInstalled %}
+            {% set salePriceEffectiveDateToFieldOptions = salePriceEffectiveDateToFieldOptions|merge([
+                {
+                    label: 'Use Sale End Date'|t('facebook-catalog-product-feed-pro'),
+                    value: constant('OPTION_USE_SALE_END_DATE', settings)
+                }
+            ]) %}
+        {% endif %}
+
+        {{ forms.selectField({
+            label: 'Sale Price Effective Date To'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The date, time and time zone when the sale ends.'|t('facebook-catalog-product-feed-pro'),
+            id: 'salePriceEffectiveDateToField',
+            name: 'salePriceEffectiveDateToField',
+            value: settings.salePriceEffectiveDateToField,
+            options: salePriceEffectiveDateToFieldOptions|merge(fieldOptions),
+            errors: settings.getErrors('salePriceEffectiveDateToField')
+        }) }}
+
+        {% set itemGroupIdFieldOptions = [{label: '', value: ''}] %}
+        {% if isCommerceInstalled %}
+            {% set itemGroupIdFieldOptions = itemGroupIdFieldOptions|merge([
+                {
+                    label: 'Use Product ID'|t('facebook-catalog-product-feed-pro'),
+                    value: constant('OPTION_USE_PRODUCT_ID', settings)
+                }
+            ]) %}
+        {% endif %}
+
+        {{ forms.selectField({
+            label: 'Item Group ID'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Allows you to set up variants of the same product, such as different sizes, colors or patterns.'|t('facebook-catalog-product-feed-pro'),
+            id: 'itemGroupIdField',
+            name: 'itemGroupIdField',
+            value: settings.itemGroupIdField,
+            options: itemGroupIdFieldOptions|merge(fieldOptions),
+            errors: settings.getErrors('itemGroupIdField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Status'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Controls whether the item is active or archived in your catalog.'|t('facebook-catalog-product-feed-pro'),
+            name: 'status',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Additional Image'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The additional images of the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'additionalImageLinkField',
+            name: 'additionalImageLinkField',
+            value: settings.additionalImageLinkField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('additionalImageLinkField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Color'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The main color of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'color',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Gender'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The gender the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
+            name: 'gender',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Size'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The size of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'size',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Age Group'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The age group that the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
+            name: 'ageGroup',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Material'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The material the item is made from.'|t('facebook-catalog-product-feed-pro'),
+            name: 'material',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Pattern'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The pattern or graphic print on the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'pattern',
+            options: customValueOptions|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Shipping Weight'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The shipping weight of the item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'shippingWeightField',
+            name: 'shippingWeightField',
+            value: settings.shippingWeightField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('shippingWeightField')
+        }) }}
+
+        {{ _self.customValueField({
+            label: 'Shipping Weight Unit'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The shipping weight unit of the item.'|t('facebook-catalog-product-feed-pro'),
+            name: 'shippingWeightUnit',
+            options: [
+                {label: (isCommerceInstalled ? 'Use Weight Unit'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
+                {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
+            ]|merge(fieldOptions),
+            settings: settings
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Custom Label 0'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
+            id: 'customLabel0Field',
+            name: 'customLabel0Field',
+            value: settings.customLabel0Field,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('customLabel0Field')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Custom Label 1'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
+            id: 'customLabel1Field',
+            name: 'customLabel1Field',
+            value: settings.customLabel1Field,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('customLabel1Field')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Custom Label 2'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
+            id: 'customLabel2Field',
+            name: 'customLabel2Field',
+            value: settings.customLabel2Field,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('customLabel2Field')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Custom Label 3'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
+            id: 'customLabel3Field',
+            name: 'customLabel3Field',
+            value: settings.customLabel3Field,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('customLabel3Field')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Custom Label 4'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
+            id: 'customLabel4Field',
+            name: 'customLabel4Field',
+            value: settings.customLabel4Field,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('customLabel4Field')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Product Type'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The category the item belongs to according to your business\'s product categorization system, if you have one.'|t('facebook-catalog-product-feed-pro'),
+            id: 'productTypeField',
+            name: 'productTypeField',
+            value: settings.productTypeField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('productTypeField')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'GTIN'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The item\'s Global Trade Item Number (GTINs).'|t('facebook-catalog-product-feed-pro'),
+            id: 'gtinField',
+            name: 'gtinField',
+            value: settings.gtinField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('gtinField')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'MPN'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The unique manufacturer ID for item.'|t('facebook-catalog-product-feed-pro'),
+            id: 'mpnField',
+            name: 'mpnField',
+            value: settings.mpnField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('mpnField')
+        }) }}
+
+        {{ forms.selectField({
+            label: 'Expiration Date'|t('facebook-catalog-product-feed-pro'),
+            instructions: 'The item expiration.'|t('facebook-catalog-product-feed-pro'),
+            id: 'expirationDateField',
+            name: 'expirationDateField',
+            value: settings.expirationDateField,
+            options: {'': ''}|merge(fieldOptions),
+            errors: settings.getErrors('expirationDateField')
+        }) }}
+
     </div>
+    <div id="tab-filters" class="hidden">
 
-    <hr>
-{% endif %}
+        <h2>{{ 'Entries'|t('facebook-catalog-product-feed-pro') }}</h2>
 
-<h2>{{ 'Fields Mapping'|t('facebook-catalog-product-feed-pro') }}</h2>
-
-<h3>{{ 'Required Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
-
-{{ forms.selectField({
-    label: 'ID'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'A unique content ID for the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'idField',
-    name: 'idField',
-    value: settings.idField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('idField')
-}) }}
-
-{{ forms.selectField({
-    label: 'Title'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'A specific, relevant title for the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'titleField',
-    name: 'titleField',
-    value: settings.titleField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('titleField')
-}) }}
-
-{{ forms.selectField({
-    label: 'Description'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'A short, relevant description of the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'descriptionField',
-    name: 'descriptionField',
-    value: settings.descriptionField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('descriptionField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Availability'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The current availability of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'availability',
-    options: [
-        {label: (isCommerceInstalled ? 'Use Stock Field'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-    ]|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Condition'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The condition of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'condition',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Price'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The price of the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'priceField',
-    name: 'priceField',
-    value: settings.priceField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('priceField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Currency'|t('facebook-catalog-product-feed-pro'),
-    name: 'currency',
-    options: [
-        {label: (isCommerceInstalled ? 'Use Base Currency'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-    ]|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Image'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The main image of the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'imageLinkField',
-    name: 'imageLinkField',
-    value: settings.imageLinkField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('imageLinkField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Brand'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The brand name, unique manufacturer part number (MPN) or Global Trade Item Number (GTIN) of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'brand',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-<h3>{{ 'Optional Fields'|t('facebook-catalog-product-feed-pro') }}</h3>
-
-{{ _self.customValueField({
-    label: 'Quantity to Sell on Facebook'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The quantity of this item that you have available to sell on Facebook and Instagram.'|t('facebook-catalog-product-feed-pro'),
-    name: 'quantityToSellOnFacebook',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Facebook Product Category'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The Facebook product category for the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'fbProductCategory',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Google Product Category'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The Google product category for the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'googleProductCategory',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Sale Price'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'If the item is on sale, enter its discounted price.'|t('facebook-catalog-product-feed-pro'),
-    id: 'salePriceField',
-    name: 'salePriceField',
-    value: settings.salePriceField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('salePriceField')
-}) }}
-
-{% set salePriceEffectiveDateFromFieldOptions = [{label: '', value: ''}] %}
-{% if isCommerceInstalled %}
-    {% set salePriceEffectiveDateFromFieldOptions = salePriceEffectiveDateFromFieldOptions|merge([
-        {
-            label: 'Use Sale Start Date'|t('facebook-catalog-product-feed-pro'),
-            value: constant('OPTION_USE_SALE_START_DATE', settings)
-        }
-    ]) %}
-{% endif %}
-
-{{ forms.selectField({
-    label: 'Sale Price Effective Date From'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The date, time and time zone when the sale starts.'|t('facebook-catalog-product-feed-pro'),
-    id: 'salePriceEffectiveDateFromField',
-    name: 'salePriceEffectiveDateFromField',
-    value: settings.salePriceEffectiveDateFromField,
-    options: salePriceEffectiveDateFromFieldOptions|merge(fieldOptions),
-    errors: settings.getErrors('salePriceEffectiveDateFromField')
-}) }}
-
-{% set salePriceEffectiveDateToFieldOptions = [{label: '', value: ''}] %}
-{% if isCommerceInstalled %}
-    {% set salePriceEffectiveDateToFieldOptions = salePriceEffectiveDateToFieldOptions|merge([
-        {
-            label: 'Use Sale End Date'|t('facebook-catalog-product-feed-pro'),
-            value: constant('OPTION_USE_SALE_END_DATE', settings)
-        }
-    ]) %}
-{% endif %}
-
-{{ forms.selectField({
-    label: 'Sale Price Effective Date To'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The date, time and time zone when the sale ends.'|t('facebook-catalog-product-feed-pro'),
-    id: 'salePriceEffectiveDateToField',
-    name: 'salePriceEffectiveDateToField',
-    value: settings.salePriceEffectiveDateToField,
-    options: salePriceEffectiveDateToFieldOptions|merge(fieldOptions),
-    errors: settings.getErrors('salePriceEffectiveDateToField')
-}) }}
-
-{% set itemGroupIdFieldOptions = [{label: '', value: ''}] %}
-{% if isCommerceInstalled %}
-    {% set itemGroupIdFieldOptions = itemGroupIdFieldOptions|merge([
-        {
-            label: 'Use Product ID'|t('facebook-catalog-product-feed-pro'),
-            value: constant('OPTION_USE_PRODUCT_ID', settings)
-        }
-    ]) %}
-{% endif %}
-
-{{ forms.selectField({
-    label: 'Item Group ID'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Allows you to set up variants of the same product, such as different sizes, colors or patterns.'|t('facebook-catalog-product-feed-pro'),
-    id: 'itemGroupIdField',
-    name: 'itemGroupIdField',
-    value: settings.itemGroupIdField,
-    options: itemGroupIdFieldOptions|merge(fieldOptions),
-    errors: settings.getErrors('itemGroupIdField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Status'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Controls whether the item is active or archived in your catalog.'|t('facebook-catalog-product-feed-pro'),
-    name: 'status',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Additional Image'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The additional images of the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'additionalImageLinkField',
-    name: 'additionalImageLinkField',
-    value: settings.additionalImageLinkField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('additionalImageLinkField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Color'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The main color of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'color',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Gender'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The gender the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
-    name: 'gender',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Size'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The size of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'size',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Age Group'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The age group that the item is targeted towards.'|t('facebook-catalog-product-feed-pro'),
-    name: 'ageGroup',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Material'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The material the item is made from.'|t('facebook-catalog-product-feed-pro'),
-    name: 'material',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ _self.customValueField({
-    label: 'Pattern'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The pattern or graphic print on the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'pattern',
-    options: customValueOptions|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Shipping Weight'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The shipping weight of the item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'shippingWeightField',
-    name: 'shippingWeightField',
-    value: settings.shippingWeightField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('shippingWeightField')
-}) }}
-
-{{ _self.customValueField({
-    label: 'Shipping Weight Unit'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The shipping weight unit of the item.'|t('facebook-catalog-product-feed-pro'),
-    name: 'shippingWeightUnit',
-    options: [
-        {label: (isCommerceInstalled ? 'Use Weight Unit'|t('facebook-catalog-product-feed-pro') : ''), value: ''},
-        {label: 'Custom Value...'|t('facebook-catalog-product-feed-pro'), value: constant('OPTION_CUSTOM_VALUE', settings)}
-    ]|merge(fieldOptions),
-    settings: settings
-}) }}
-
-{{ forms.selectField({
-    label: 'Custom Label 0'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
-    id: 'customLabel0Field',
-    name: 'customLabel0Field',
-    value: settings.customLabel0Field,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('customLabel0Field')
-}) }}
-
-{{ forms.selectField({
-    label: 'Custom Label 1'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
-    id: 'customLabel1Field',
-    name: 'customLabel1Field',
-    value: settings.customLabel1Field,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('customLabel1Field')
-}) }}
-
-{{ forms.selectField({
-    label: 'Custom Label 2'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
-    id: 'customLabel2Field',
-    name: 'customLabel2Field',
-    value: settings.customLabel2Field,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('customLabel2Field')
-}) }}
-
-{{ forms.selectField({
-    label: 'Custom Label 3'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
-    id: 'customLabel3Field',
-    name: 'customLabel3Field',
-    value: settings.customLabel3Field,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('customLabel3Field')
-}) }}
-
-{{ forms.selectField({
-    label: 'Custom Label 4'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'Any additional information you want to filter items by when you create sets.'|t('facebook-catalog-product-feed-pro'),
-    id: 'customLabel4Field',
-    name: 'customLabel4Field',
-    value: settings.customLabel4Field,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('customLabel4Field')
-}) }}
-
-{{ forms.selectField({
-    label: 'Product Type'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The category the item belongs to according to your business\'s product categorization system, if you have one.'|t('facebook-catalog-product-feed-pro'),
-    id: 'productTypeField',
-    name: 'productTypeField',
-    value: settings.productTypeField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('productTypeField')
-}) }}
-
-{{ forms.selectField({
-    label: 'GTIN'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The item\'s Global Trade Item Number (GTINs).'|t('facebook-catalog-product-feed-pro'),
-    id: 'gtinField',
-    name: 'gtinField',
-    value: settings.gtinField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('gtinField')
-}) }}
-
-{{ forms.selectField({
-    label: 'MPN'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The unique manufacturer ID for item.'|t('facebook-catalog-product-feed-pro'),
-    id: 'mpnField',
-    name: 'mpnField',
-    value: settings.mpnField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('mpnField')
-}) }}
-
-{{ forms.selectField({
-    label: 'Expiration Date'|t('facebook-catalog-product-feed-pro'),
-    instructions: 'The item expiration.'|t('facebook-catalog-product-feed-pro'),
-    id: 'expirationDateField',
-    name: 'expirationDateField',
-    value: settings.expirationDateField,
-    options: {'': ''}|merge(fieldOptions),
-    errors: settings.getErrors('expirationDateField')
-}) }}
-
-<hr>
-
-<h2>{{ 'Filters'|t('facebook-catalog-product-feed-pro') }}</h2>
-
-<h3>{{ 'Entries'|t('facebook-catalog-product-feed-pro') }}</h3>
-
-{{ forms.checkboxGroupField({
-    label: 'Status'|t('facebook-catalog-product-feed-pro'),
-    id: 'entryStatusFilter',
-    name: 'entryStatusFilter',
-    values: settings.entryStatusFilter,
-    options: settings.statusFilterOptions,
-    errors: settings.getErrors('entryStatusFilter')
-}) }}
-
-{% if settings.entryTypeFilterOptions|length %}
-    {{ forms.checkboxGroupField({
-        label: 'Type'|t('facebook-catalog-product-feed-pro'),
-        id: 'entryTypeFilter',
-        name: 'entryTypeFilter',
-        values: settings.entryTypeFilter,
-        options: settings.entryTypeFilterOptions,
-        errors: settings.getErrors('entryTypeFilter')
-    }) }}
-{% endif %}
-
-{{ forms.elementSelectField({
-    label: 'Category'|t('facebook-catalog-product-feed-pro'),
-    id: 'entryCategoryFilter',
-    name: 'entryCategoryFilter',
-    elements: (settings.entryCategoryFilter|length ? craft.categories.id(settings.entryCategoryFilter).all() : []),
-    elementType: 'craft\\elements\\Category',
-    errors: settings.getErrors('entryCategoryFilter'),
-}) }}
-
-{% if isCommerceInstalled %}
-    <h3>{{ 'Products'|t('facebook-catalog-product-feed-pro') }}</h3>
-
-    {{ forms.checkboxGroupField({
-        label: 'Status'|t('facebook-catalog-product-feed-pro'),
-        id: 'productStatusFilter',
-        name: 'productStatusFilter',
-        values: settings.productStatusFilter,
-        options: settings.statusFilterOptions,
-        errors: settings.getErrors('productStatusFilter')
-    }) }}
-
-    {% if settings.productTypeFilterOptions|length %}
         {{ forms.checkboxGroupField({
-            label: 'Type'|t('facebook-catalog-product-feed-pro'),
-            id: 'productTypeFilter',
-            name: 'productTypeFilter',
-            values: settings.productTypeFilter,
-            options: settings.productTypeFilterOptions,
-            errors: settings.getErrors('productTypeFilter')
+            label: 'Status'|t('facebook-catalog-product-feed-pro'),
+            id: 'entryStatusFilter',
+            name: 'entryStatusFilter',
+            values: settings.entryStatusFilter,
+            options: settings.statusFilterOptions,
+            errors: settings.getErrors('entryStatusFilter')
         }) }}
-    {% endif %}
 
-    {{ forms.elementSelectField({
-        label: 'Category'|t('facebook-catalog-product-feed-pro'),
-        id: 'productCategoryFilter',
-        name: 'productCategoryFilter',
-        elements: (settings.productCategoryFilter|length ? craft.categories.id(settings.productCategoryFilter).all() : []),
-        elementType: 'craft\\elements\\Category',
-        errors: settings.getErrors('productCategoryFilter'),
-    }) }}
+        {% if settings.entryTypeFilterOptions|length %}
+            {{ forms.checkboxGroupField({
+                label: 'Type'|t('facebook-catalog-product-feed-pro'),
+                id: 'entryTypeFilter',
+                name: 'entryTypeFilter',
+                values: settings.entryTypeFilter,
+                options: settings.entryTypeFilterOptions,
+                errors: settings.getErrors('entryTypeFilter')
+            }) }}
+        {% endif %}
 
-    {{ forms.checkboxField({
-        label: 'Available for Purcahse'|t('facebook-catalog-product-feed-pro'),
-        id: 'productAvailableForPurchaseFilter',
-        name: 'productAvailableForPurchaseFilter',
-        checked: settings.productAvailableForPurchaseFilter,
-        errors: settings.getErrors('productAvailableForPurchaseFilter')
-    }) }}
-{% endif %}
+        {{ forms.elementSelectField({
+            label: 'Category'|t('facebook-catalog-product-feed-pro'),
+            id: 'entryCategoryFilter',
+            name: 'entryCategoryFilter',
+            elements: (settings.entryCategoryFilter|length ? craft.categories.id(settings.entryCategoryFilter).all() : []),
+            elementType: 'craft\\elements\\Category',
+            errors: settings.getErrors('entryCategoryFilter'),
+        }) }}
+
+        {% if isCommerceInstalled %}
+            <hr>
+
+            <h2>{{ 'Products'|t('facebook-catalog-product-feed-pro') }}</h2>
+
+            {{ forms.checkboxGroupField({
+                label: 'Status'|t('facebook-catalog-product-feed-pro'),
+                id: 'productStatusFilter',
+                name: 'productStatusFilter',
+                values: settings.productStatusFilter,
+                options: settings.statusFilterOptions,
+                errors: settings.getErrors('productStatusFilter')
+            }) }}
+
+            {% if settings.productTypeFilterOptions|length %}
+                {{ forms.checkboxGroupField({
+                    label: 'Type'|t('facebook-catalog-product-feed-pro'),
+                    id: 'productTypeFilter',
+                    name: 'productTypeFilter',
+                    values: settings.productTypeFilter,
+                    options: settings.productTypeFilterOptions,
+                    errors: settings.getErrors('productTypeFilter')
+                }) }}
+            {% endif %}
+
+            {{ forms.elementSelectField({
+                label: 'Category'|t('facebook-catalog-product-feed-pro'),
+                id: 'productCategoryFilter',
+                name: 'productCategoryFilter',
+                elements: (settings.productCategoryFilter|length ? craft.categories.id(settings.productCategoryFilter).all() : []),
+                elementType: 'craft\\elements\\Category',
+                errors: settings.getErrors('productCategoryFilter'),
+            }) }}
+
+            {{ forms.checkboxField({
+                label: 'Available for Purcahse'|t('facebook-catalog-product-feed-pro'),
+                id: 'productAvailableForPurchaseFilter',
+                name: 'productAvailableForPurchaseFilter',
+                checked: settings.productAvailableForPurchaseFilter,
+                errors: settings.getErrors('productAvailableForPurchaseFilter')
+            }) }}
+        {% endif %}
+
+    </div>
+{% endnamespace %}
