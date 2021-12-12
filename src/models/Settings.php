@@ -10,6 +10,8 @@ namespace kerosin\facebookcatalogproductfeedpro\models;
 
 use Craft;
 use craft\base\Model;
+use craft\commerce\Plugin as CommercePlugin;
+use craft\helpers\ArrayHelper;
 
 /**
  * @author    kerosin
@@ -37,6 +39,31 @@ class Settings extends Model
 
     const AVAILABILITY_IN_STOCK = 'in stock';
     const AVAILABILITY_OUT_OF_STOCK = 'out of stock';
+
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_LIVE = 'live';
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_PENDING = 'pending';
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_EXPIRED = 'expired';
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_ENABLED = 'enabled';
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_DISABLED = 'disabled';
+    /**
+     * @since 1.4.0
+     */
+    const FILTER_STATUS_ARCHIVED = 'archived';
 
     // Public Properties
     // =========================================================================
@@ -415,6 +442,62 @@ class Settings extends Model
      */
     public $expirationDateField;
 
+    /**
+     * Entry status filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $entryStatusFilter = [self::FILTER_STATUS_LIVE];
+
+    /**
+     * Entry type filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $entryTypeFilter = [];
+
+    /**
+     * Entry category filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $entryCategoryFilter = [];
+
+    /**
+     * Product status filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $productStatusFilter = [self::FILTER_STATUS_LIVE];
+
+    /**
+     * Product type filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $productTypeFilter = [];
+
+    /**
+     * Product category filter.
+     *
+     * @var array
+     * @since 1.4.0
+     */
+    public $productCategoryFilter = [];
+
+    /**
+     * Product available for purchase filter.
+     *
+     * @var string
+     * @since 1.4.0
+     */
+    public $productAvailableForPurchaseFilter;
+
     // Public Methods
     // =========================================================================
 
@@ -511,6 +594,67 @@ class Settings extends Model
     }
 
     /**
+     * @return array
+     * @since 1.4.0
+     */
+    public function getStatusFilterOptions(): array
+    {
+        return [
+            self::FILTER_STATUS_LIVE => Craft::t('facebook-catalog-product-feed-pro', 'Live'),
+            self::FILTER_STATUS_PENDING => Craft::t('facebook-catalog-product-feed-pro', 'Pending'),
+            self::FILTER_STATUS_EXPIRED => Craft::t('facebook-catalog-product-feed-pro', 'Expired'),
+            self::FILTER_STATUS_ENABLED => Craft::t('facebook-catalog-product-feed-pro', 'Enabled'),
+            self::FILTER_STATUS_DISABLED => Craft::t('facebook-catalog-product-feed-pro', 'Disabled'),
+            self::FILTER_STATUS_ARCHIVED => Craft::t('facebook-catalog-product-feed-pro', 'Archived'),
+        ];
+    }
+
+    /**
+     * @return array
+     * @since 1.4.0
+     */
+    public function getEntryTypeFilterOptions(): array
+    {
+        $result = [];
+        $sections = Craft::$app->getSections()->getAllSections();
+
+        foreach ($sections as $section) {
+            foreach ($section->getEntryTypes() as $entryType) {
+                $result[] = [
+                    'value' => $entryType->id,
+                    'label' => Craft::t('site', $section->name) . ' - ' . Craft::t('site', $entryType->name),
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     * @since 1.4.0
+     */
+    public function getProductTypeFilterOptions(): array
+    {
+        $result = [];
+
+        if (!Craft::$app->getPlugins()->isPluginInstalled('commerce')) {
+            return $result;
+        }
+
+        $productTypes = CommercePlugin::getInstance()->getProductTypes()->getAllProductTypes();
+
+        foreach ($productTypes as $productType) {
+            $result[] = [
+                'value' => $productType->id,
+                'label' => Craft::t('site', $productType->name),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
@@ -525,6 +669,9 @@ class Settings extends Model
             array_keys($this->getStandardFields()),
             array_keys($this->getCustomFields())
         );
+        $statusFilterOptions = array_keys($this->getStatusFilterOptions());
+        $entryTypeFilterOptions = ArrayHelper::getColumn($this->getEntryTypeFilterOptions(), 'value');
+        $productTypeFilterOptions = ArrayHelper::getColumn($this->getProductTypeFilterOptions(), 'value');
 
         return [
             ['includeVariants', 'boolean'],
@@ -565,6 +712,10 @@ class Settings extends Model
             ['expirationDateField', 'in', 'range' => $fieldOptions],
             ['gtinField', 'in', 'range' => $fieldOptions],
             ['mpnField', 'in', 'range' => $fieldOptions],
+            ['entryStatusFilter', 'in', 'allowArray' => true, 'range' => $statusFilterOptions],
+            ['entryTypeFilter', 'in', 'allowArray' => true, 'range' => $entryTypeFilterOptions],
+            ['productStatusFilter', 'in', 'allowArray' => true, 'range' => $statusFilterOptions],
+            ['productTypeFilter', 'in', 'allowArray' => true, 'range' => $productTypeFilterOptions],
         ];
     }
 }
