@@ -1,5 +1,13 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.4.0 - 2021-12-12
+### Added
+- Added filters
+- Added code improvements
+
+### Changed
+- Updated plugin settings UI
+
 ## 1.3.1 - 2021-11-19
 ### Fixed
 - Fixed bug that could occur if Craft Commerce plugin was not installed
