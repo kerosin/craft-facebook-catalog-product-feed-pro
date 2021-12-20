@@ -1,5 +1,9 @@
 # Facebook Catalog Product Feed Pro Changelog
 
+## 1.5.1 - 2021-12-21
+### Fixed
+- Fixed plugin settings UI for Craft version before 3.7
+
 ## 1.5.0 - 2021-12-20
 ### Added
 - Added custom tags
