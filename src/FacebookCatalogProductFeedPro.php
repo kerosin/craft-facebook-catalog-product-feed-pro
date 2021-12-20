@@ -110,7 +110,6 @@ class FacebookCatalogProductFeedPro extends Plugin
             'facebook-catalog-product-feed-pro/settings',
             [
                 'settings' => $this->getSettings(),
-                'isVersionLessThan37' => version_compare(Craft::$app->getInfo()->version, '3.7', '<'),
             ]
         );
     }
@@ -132,6 +131,7 @@ class FacebookCatalogProductFeedPro extends Plugin
         return $controller->renderTemplate($template, [
             'plugin' => $this,
             'settingsHtml' => $this->settingsHtml(),
+            'isVersionLt37' => version_compare(Craft::$app->getInfo()->version, '3.7', '<'),
         ]);
     }
 
