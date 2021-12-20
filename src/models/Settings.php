@@ -443,6 +443,14 @@ class Settings extends Model
     public $expirationDateField;
 
     /**
+     * Custom tags.
+     *
+     * @var array
+     * @since 1.5.0
+     */
+    public $customTags = [];
+
+    /**
      * Entry status filter.
      *
      * @var array

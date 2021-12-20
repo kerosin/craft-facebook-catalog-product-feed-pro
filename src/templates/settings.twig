@@ -487,6 +487,35 @@
             errors: settings.getErrors('expirationDateField')
         }) }}
 
+        <hr>
+
+        <h2>{{ 'Custom Tags'|t('facebook-catalog-product-feed-pro') }}</h2>
+
+        {{ forms.editableTableField({
+            id: 'customTags',
+            name: 'customTags',
+            cols: {
+                name: {
+                    type: 'singleline',
+                    heading: 'Name'|t('facebook-catalog-product-feed-pro')
+                },
+                field: {
+                    type: 'select',
+                    heading: 'Field'|t('facebook-catalog-product-feed-pro'),
+                    options: [{
+                        label: 'Custom Value'|t('facebook-catalog-product-feed-pro'),
+                        value: constant('OPTION_CUSTOM_VALUE', settings)
+                    }]|merge(fieldOptions)
+                },
+                customValue: {
+                    type: 'singleline',
+                    heading: 'Custom Value'|t('facebook-catalog-product-feed-pro')
+                }
+            },
+            rows: settings.customTags,
+            errors: settings.getErrors('customTags')
+        }) }}
+
     </div>
 
     {% if isCommerceInstalled %}
