@@ -105,7 +105,7 @@ class FeedController extends Controller
      */
     protected function saveXmlToFile(string $xml, ?string $filePrefix = null): void
     {
-        $path = Craft::getAlias('@webroot') . '/assets/facebook-catalog-product-feed-pro/';
+        $path = Craft::getAlias('@webroot') . '/facebook-catalog-product-feed-pro/';
         $path .= $filePrefix != null ? $filePrefix . '-' : '';
         $path .= Craft::$app->getSites()->getCurrentSite()->handle . '.xml';
 

@@ -42,7 +42,7 @@ To save the output to a file add `save` query param to the url:
     
 The file will be saved in the following path:
 
-    http://example.com/assets/facebook-catalog-product-feed-pro/entries-SITE_HANDLE.xml
+    http://example.com/facebook-catalog-product-feed-pro/entries-SITE_HANDLE.xml
     
 Replace **SITE_HANDLE** in the url with a real site handle.
     
@@ -56,7 +56,7 @@ To save the output to a file add `save` query param to the url:
     
 The file will be saved in the following path:
 
-    http://example.com/assets/facebook-catalog-product-feed-pro/products-SITE_HANDLE.xml
+    http://example.com/facebook-catalog-product-feed-pro/products-SITE_HANDLE.xml
     
 Replace **SITE_HANDLE** in the url with a real site handle.
     
